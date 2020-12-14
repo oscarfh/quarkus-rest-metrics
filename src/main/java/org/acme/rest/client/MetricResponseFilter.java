@@ -11,6 +11,9 @@ import io.quarkus.micrometer.runtime.binder.vertx.VertxMetricsTags;
 import io.vertx.core.http.HttpClientResponse;
 import javax.inject.Inject;
 import javax.interceptor.ExcludeClassInterceptors;
+import javax.ws.rs.client.ClientRequestContext;
+import javax.ws.rs.client.ClientResponseContext;
+import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -18,16 +21,14 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class MetricResponseFilter implements ContainerResponseFilter {
+public class MetricResponseFilter implements ClientResponseFilter {
 	public static final String HTTP_CLIENT_METRIC_NAME = "http.client.requests";
 
 	@Inject
 	MeterRegistry registry;
 
 	@Override
-	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-			throws IOException
-	{
+	public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext) throws IOException {
 		Timer.Sample sample = getRequestSample(requestContext);
 		if (sample != null) {
 			String requestPath = getRequestPath(requestContext);
@@ -42,11 +43,11 @@ public class MetricResponseFilter implements ContainerResponseFilter {
 		}
 	}
 
-	private String getRequestPath(ContainerRequestContext requestContext) {
-		return requestContext.getUriInfo().getPath();
+	private String getRequestPath(ClientRequestContext requestContext) {
+		return requestContext.getUri().getPath();
 	}
 
-	private Timer.Sample getRequestSample(ContainerRequestContext requestContext) {
+	private Timer.Sample getRequestSample(ClientRequestContext requestContext) {
 		return (Timer.Sample) requestContext.getProperty(MetricRequestFilter.REQUEST_TIMER_SAMPLE_PROPERTY);
 	}
 }
