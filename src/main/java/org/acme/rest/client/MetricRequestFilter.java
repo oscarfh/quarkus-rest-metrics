@@ -1,3 +1,4 @@
+/*
 package org.acme.rest.client;
 
 import java.io.IOException;
@@ -22,3 +23,4 @@ public class MetricRequestFilter implements ClientRequestFilter {
 		requestContext.setProperty(REQUEST_TIMER_SAMPLE_PROPERTY, Timer.start(registry));
 	}
 }
+*/
